@@ -1,10 +1,17 @@
 from Player import Player
 from Game import Game
 import random
+import threading
 
+"""
+a games object is thread safe
+"""
 class Games:
 	def __init__(self):
-		self.arr={}#the key is the gameId, we get the gameId from the player
+		self.games={}#the key is the gameId, we get the gameId from the player
+		self.gamesIsAvailable=True
+		self.gamesLock=threading.Lock()
+		self.gamesCV=threading.Condition(self.gamesLock)
 
 	def add(self,username1,username2,addressPortTuple1,addressPortTuple2):
 		playerId1=hash(username1+str(random.random()) )
@@ -16,8 +23,26 @@ class Games:
 		gameId=hash(p1.id+p2.id)
 		
 		game=Game(p1,p2,gameId)
-		self.arr[game.id]=game
+		with self.gamesCV:
+			while not self.gamesIsAvailable:
+				print "Games: add: WAITING for games object"
+				self.gamesCV.wait()
+				print "Games: add: DONE waiting for games object"
+		self.gamesIsAvailable=False
+		self.games[game.id]=game
+		self.gamesIsAvailable=True
+
+		
 
 	def play(self,gameId,playerId,position):
-		self.arr[gameId].play(playerId,position)
+		with self.gamesCV:
+			while not self.gamesIsAvailable:
+				print "Games: add: WAITING for games object"
+				self.gamesCV.wait()
+				print "Games: add: DONE waiting for games object"
+		self.gamesIsAvailable=False
+		self.games[gameId].play(playerId,position)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
+		self.gamesIsAvailable=True
+
+		
 #done with Games
