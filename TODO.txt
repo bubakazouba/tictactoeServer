@@ -1,0 +1,1 @@
+split Games object to 3x3x3Games and 4x4x4Games
