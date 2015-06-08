@@ -112,10 +112,14 @@ def main():#{
 		print "main: WAITING for message"
 		msg,addressPortTuple=sock.recvfrom(1024)
 		print "main: GOT msg=",msg
-		msg=json.loads(msg)
+		try:
+			msg=json.loads(msg)
+		except:
+			msg={"msg":msg}
+
 		if "username" in msg.keys():#{ wanna play a new game
 			with newTTTPlayersCV:
-				msg["addressportTuple"]=addressportTuple
+				msg["addressPortTuple"]=addressPortTuple
 				#msg contains the username, addressPortTuple
 				newTTTPlayersQ.put(msg)
 				print "main: DID put him in the newTTTPlayersQ"
