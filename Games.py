@@ -28,6 +28,7 @@ class Games:
 				print "Games: add: WAITING for games object"
 				self.gamesCV.wait()
 				print "Games: add: DONE waiting for games object"
+
 		self.gamesIsAvailable=False
 		self.games[game.id]=game
 		self.gamesIsAvailable=True

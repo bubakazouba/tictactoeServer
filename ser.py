@@ -109,22 +109,25 @@ def main():#{
 	listenForNewTTTPlayersThread.start()
 
 	while True:#{
-		print "main: WAITING for message"
+		print "main: WAITING for message<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",random.randint(1,100)
 		msg,addressPortTuple=sock.recvfrom(1024)
+		with open("log.txt","a") as logFile:
+			logFile.write(msg+"\n")
 		print "main: GOT msg=",msg
 		try:
 			msg=json.loads(msg)
 		except:
 			msg={"msg":msg}
 
-		if "username" in msg.keys():#{ wanna play a new game
+		if "username" in msg.keys():#{ //wanna play a new game
 			with newTTTPlayersCV:
 				msg["addressPortTuple"]=addressPortTuple
 				#msg contains the username, addressPortTuple
+				print "main: GOING to put him in newTTTPlayersQ"
 				newTTTPlayersQ.put(msg)
 				print "main: DID put him in the newTTTPlayersQ"
 				newTTTPlayersCV.notify()
-		#}
+		#}// end wanna play a new game
 		elif "position" in msg.keys():#{ wanna make a play
 			#msg contains the gameId,playerId,position
 			newPlaysQ.put(msg)
