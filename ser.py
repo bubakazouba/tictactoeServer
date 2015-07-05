@@ -10,7 +10,7 @@ to be locked anyways
 #this thread runs a function that just keeps waiting until the main thread notifies it to take the other player
 #
 
-import Socket
+from Socket import Socket
 import threading,random,json,Queue
 from Games import Games
 
@@ -34,12 +34,11 @@ def listenForNewPlays():#{
 	print "listenForNewPlays||just started im in thread:",threading.current_thread().getName()
 	while True:#{
 		with newPlaysCV:#{
-			while newPlaysQ.empty():#{ #just wait while its empty
+			while newPlaysQ.empty():# just wait while its empty
 				print "listenForNewPlayers||waiting for a new player"
 				newPlaysCV.wait()
 				print "listenForNewPlayers||done waiting for a new player"
-			#}
-		#} done with newPlaysCV
+		#done with newPlaysCV
 		msg=newPlaysQ.get()#msg is a dict{gameId,playerId,position}
 		gameId=msg["gameId"]
 		playerId=msg["playerId"]
@@ -108,8 +107,8 @@ def main():
 	while True:#{
 		print "main||WAITING for message<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",random.randint(1,100)
 		msg,addressPortTuple=sock.recvfrom(1024)
-		with open("log.txt","a") as logFile:
-			logFile.write(msg+"\n")
+		# with open("log.txt","a") as logFile:
+			# logFile.write(msg+"\n")
 		print "main||GOT msg=",msg
 		try:
 			msg=json.loads(msg)
@@ -122,13 +121,13 @@ def main():
 				#msg contains the username, addressPortTuple
 				print "main||GOING to put him in newTTTPlayersQ"
 				newTTTPlayersQ.put(msg)
-				print "main||DID put him in the newTTTPlayersQ"
+				# print "main||DID put him in the newTTTPlayersQ"
 				newTTTPlayersCV.notify()
 		#end wanna play a new game
 		elif "position" in msg.keys():#{ wanna make a play
 			#msg contains the gameId,playerId,position
 			newPlaysQ.put(msg)
-			print "main||DID put him in the newPlaysQ"
+			# print "main||DID put him in the newPlaysQ"
 			newPlaysCV.notify()
 		#end elif "position" in msg.keys()
 
