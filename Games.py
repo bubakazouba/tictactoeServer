@@ -7,11 +7,13 @@ import threading
 a games object is thread safe
 """
 class Games:
-	def __init__(self):
-		self.games={}#the key is the gameId, we get the gameId from the player
-		self.gamesIsAvailable=True
-		self.gamesLock=threading.Lock()
-		self.gamesCV=threading.Condition(self.gamesLock)
+	def __init__(self,sock):
+		self.games = {}#the key is the gameId, we get the gameId from the player
+		self.gamesIsAvailable = True
+		self.gamesLock = threading.Lock()
+		self.gamesCV = threading.Condition(self.gamesLock)
+		self.sock = sock
+	#end __init__
 
 	def add(self,username1,username2,addressPortTuple1,addressPortTuple2):
 		playerId1=hash(username1+str(random.random()) )
@@ -22,7 +24,7 @@ class Games:
 
 		gameId=hash(p1.id+p2.id)
 		
-		game=Game(p1,p2,gameId)
+		game=Game(p1,p2,gameId,self.sock)
 		with self.gamesCV:
 			while not self.gamesIsAvailable:
 				print "Games: add: WAITING for games object"

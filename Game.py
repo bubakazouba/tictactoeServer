@@ -1,4 +1,4 @@
-from socket import *
+import Socket
 from Player import Player
 import json
 import threading
@@ -10,15 +10,13 @@ class Game:
 	2-creates a socket (self.sock)
 	3-sends to both players their playerId,gameId,whichPlayer
 	"""
-	def __init__(self,player1,player2,gameId):
+	def __init__(self,player1,player2,gameId,sock):
 		print "__init__ Game: thread=",threading.current_thread().getName()
 		self.player1=player1
 		self.player2=player2
 		self.id=gameId
 
-		sock=socket(AF_INET,SOCK_DGRAM)
-		sock.setsockopt(SOL_SOCKET,SO_REUSEPORT, 1)#so any socket can use this port
-		sock.bind(('',5005))
+		self.sock=sock
 
 		player1Msg=json.dumps({"playerId":self.player1.id,"gameId":self.id,"whichPlayer":"1"})
 		player2Msg=json.dumps({"playerId":self.player2.id,"gameId":self.id,"whichPlayer":"2"})
