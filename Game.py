@@ -18,11 +18,11 @@ class Game:
 
 		self.sock=sock
 
-		player1Msg=json.dumps({"playerId":self.player1.id,"gameId":self.id,"whichPlayer":"1"})
-		player2Msg=json.dumps({"playerId":self.player2.id,"gameId":self.id,"whichPlayer":"2"})
+		player1Msg={"playerId":self.player1.id,"gameId":self.id,"whichPlayer":"1"}
+		player2Msg={"playerId":self.player2.id,"gameId":self.id,"whichPlayer":"2"}
 		print "__init__ Game: sending to players"
-		sock.sendto(player1Msg,self.player1.addressPortTuple)
-		sock.sendto(player2Msg,self.player2.addressPortTuple)
+		self.sock.sendto(player1Msg,self.player1.addressPortTuple)
+		self.sock.sendto(player2Msg,self.player2.addressPortTuple)
 		print "__init__ Game: done sending to players"
 	#done with init
 
@@ -33,7 +33,7 @@ class Game:
 	"""
 	def play(self,playerId,position):
 
-		msg=json.dumps({"position":position})
+		msg={"position":position}
 		if playerId==self.player1.id:
 			self.sock.sendto(msg,self.player2.addressPortTuple)
 		else:

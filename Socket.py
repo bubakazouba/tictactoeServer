@@ -1,3 +1,12 @@
+"""
+TODO:
+instead of one thread for every send
+make it just one thread that handles all of these
+so the send function just sends and adds it to the dict: (msg,addressPortTuple,timesent)
+(if i got an ack in the __listen function i remove from the dict)
+the thread loops in the dict and sees if anything needs sending again, it sends if it needs sending
+"""
+
 import socket
 import threading
 import Queue #synchronized queue
@@ -24,8 +33,8 @@ class Socket:
 	#end init	
 
 	def sendto(self,msg,addressPortTuple):
-		sendThread=threading.Thread(target=self.__sendto)
-		sendThread.name="sendto"+json.dumps(addressPortTuple)
+		sendThread = threading.Thread(target = self.__sendto,args = (msg,addressPortTuple))
+		sendThread.name = "sendto"+json.dumps(addressPortTuple)
 		sendThread.start()
 
 	def __sendto(self,msg,addressPortTuple):
@@ -40,13 +49,12 @@ class Socket:
 
 		return: None
 		"""
+		msg["ack"] = str( self.ACKManager.getACK(addressPortTuple) )
 		while True:
-			msg["ack"] = self.ACKManager.getACK(addressPortTuple)
-
-			self.sock.sendto(msg,addressPortTuple)
-			print "Socket||__sendto||sent and waiting 0.5, "+json.dumps(addressPortTuple)
+			self.sock.sendto(json.dumps(msg),addressPortTuple)
+			print "Socket||__sendto||sent and waiting 0.5,"+json.dumps(addressPortTuple),"ack=",msg["ack"]
 			time.sleep(0.5)
-			if self.ACKManager.isACKConfirmed(addressPortTuple,msg["ack"]):
+			if self.ACKManager.isACKConfirmed(addressPortTuple,int(msg["ack"])):
 				print "Socket||__sendto||got ack,"+json.dumps(addressPortTuple)
 				break
 			else:
@@ -70,12 +78,12 @@ class Socket:
 	def __listen(self):
 		while True:
 			print "Socket||__listen||waiting for new msg"
-			recv,addressPortTuple=self.sock.recvfrom(1024)
-			recvJ=json.loads(recv)
+			recv,addressPortTuple = self.sock.recvfrom(1024)
+			recvJ = json.loads(recv)
 
 			if recvJ.get("msg","") == "ack":# if I'm receiving an ack, then it's an ack to a message i sent
-				print "im receiving an ack"
-				self.ACKManager.confirmACK(addressPortTuple,recvJ["ack"])
+				print "Socket||__listen||im receiving an ack"
+				self.ACKManager.confirmACK(addressPortTuple,int(recvJ["ack"]))
 				continue
 
 			else:# then it's a message intended to me, I better reply to it
@@ -103,8 +111,8 @@ class Socket:
 	#end __listen
 
 	def __startUpListeningThread(self):
-		listenThread=threading.Thread(target=self.__listen)
-		listenThread.name="listenForAllMessages"
+		listenThread = threading.Thread(target = self.__listen)
+		listenThread.name = "listenForAllMessages"
 		listenThread.start()
 	#end __startUpListeningThread
 
