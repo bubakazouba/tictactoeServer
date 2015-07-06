@@ -16,13 +16,13 @@ class Games:
 	#end __init__
 
 	def add(self,username1,username2,addressPortTuple1,addressPortTuple2):
-		playerId1=hash(username1+str(random.random()) )
+		playerId1=str(hash(username1+str(random.random()) ))
 		p1=Player(playerId1,addressPortTuple1,username1)
 
-		playerId2=hash(username2+str(random.random()) )
+		playerId2=str(hash(username2+str(random.random()) ))
 		p2=Player(playerId2,addressPortTuple2,username2)
 
-		gameId=hash(p1.id+p2.id)
+		gameId=str(hash(p1.id+p2.id))
 		
 		game=Game(p1,p2,gameId,self.sock)
 		with self.gamesCV:
@@ -37,14 +37,14 @@ class Games:
 
 		
 
-	def play(self,gameId,playerId,position):
+	def play(self,gameId,playerId,coordinates):
 		with self.gamesCV:
 			while not self.gamesIsAvailable:
 				print "Games: add: WAITING for games object"
 				self.gamesCV.wait()
 				print "Games: add: DONE waiting for games object"
 		self.gamesIsAvailable=False
-		self.games[gameId].play(playerId,position)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
+		self.games[gameId].play(playerId,coordinates)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
 		self.gamesIsAvailable=True
 
 		

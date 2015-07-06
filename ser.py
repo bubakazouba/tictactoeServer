@@ -35,19 +35,19 @@ def listenForNewPlays():#{
 	while True:#{
 		with newPlaysCV:#{
 			while newPlaysQ.empty():# just wait while its empty
-				print "listenForNewPlayers||waiting for a new player"
+				print "listenForNewPlayers||waiting for a new play"
 				newPlaysCV.wait()
-				print "listenForNewPlayers||done waiting for a new player"
+				print "listenForNewPlayers||done waiting for a new play"
 		#done with newPlaysCV
-		msg=newPlaysQ.get()#msg is a dict{gameId,playerId,position}
+		msg=newPlaysQ.get()#msg is a dict{gameId,playerId,coordinates}
 		gameId=msg["gameId"]
 		playerId=msg["playerId"]
-		position=msg["position"]
-		print "listeningPlays||SENDING position"
-		games.play(gameId,playerId,position)
-		print "listeningPlays||DONE sending position"
-	#} done with while True
-#}done with listeningPlays()
+		coordinates=msg["coordinates"]
+		print "listenForNewPlays||SENDING coordinates"
+		games.play(gameId,playerId,coordinates)
+		print "listenForNewPlays||DONE sending coordinates"
+	#done with while True
+#done with listenForNewPlays()
 
 
 newTTTPlayersLock=threading.Lock()
@@ -100,9 +100,13 @@ def listenForNewTTTPlayers():
 
 def main():
 
-	listenForNewTTTPlayersThread=threading.Thread(target=listenForNewTTTPlayers)
-	listenForNewTTTPlayersThread.name="listenForNewTTTPlayers"
+	listenForNewTTTPlayersThread = threading.Thread(target=listenForNewTTTPlayers)
+	listenForNewTTTPlayersThread.name = "listenForNewTTTPlayers"
 	listenForNewTTTPlayersThread.start()
+
+	listenForNewPlaysThread = threading.Thread(target=listenForNewPlays)
+	listenForNewPlaysThread.name = "listenForNewPlaysThread"
+	listenForNewPlaysThread.start()
 
 	while True:#{
 		print "main||WAITING for message<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",random.randint(1,100)
@@ -124,12 +128,13 @@ def main():
 				# print "main||DID put him in the newTTTPlayersQ"
 				newTTTPlayersCV.notify()
 		#end wanna play a new game
-		elif "position" in msg.keys():#{ wanna make a play
-			#msg contains the gameId,playerId,position
-			newPlaysQ.put(msg)
-			# print "main||DID put him in the newPlaysQ"
-			newPlaysCV.notify()
-		#end elif "position" in msg.keys()
+		elif "coordinates" in msg.keys():#{ wanna make a play
+			with newPlaysCV:
+				#msg contains the gameId,playerId,coordinates
+				newPlaysQ.put(msg)
+				# print "main||DID put him in the newPlaysQ"
+				newPlaysCV.notify()
+		#end elif "coordinates" in msg.keys()
 
 	#end while True
 #end main

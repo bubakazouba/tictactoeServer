@@ -27,13 +27,13 @@ class Game:
 	#done with init
 
 	"""
-	play(playerId,position):
-	1-takes playerId and position
+	play(playerId,coordinates):
+	1-takes playerId and coordinates
 	2-checks if this is player1 then send to player2 and vice versa
 	"""
-	def play(self,playerId,position):
-
-		msg={"position":position}
+	def play(self,playerId,coordinates):
+		
+		msg={"coordinates":coordinates}
 		if playerId==self.player1.id:
 			self.sock.sendto(msg,self.player2.addressPortTuple)
 		else:
