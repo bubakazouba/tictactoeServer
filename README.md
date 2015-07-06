@@ -21,8 +21,12 @@
 * in settings: volume
 * make sure it's his turn before sending to other player(so we can prevent hacks, a player can play twice in a row if we dont do that)
 * 
-* push notifications
-* 
+* push notifications:
+* 	if he didnt play for a long time push (comeone $username is waiting for u)
+*  idk what else
+*  
+*
+* beat that game: https://play.google.com/store/apps/details?id=com.rts.android.tictactoe
 ```
 ---
 ser.py listens on port 5005 (current ip: 104.236.133.238)
