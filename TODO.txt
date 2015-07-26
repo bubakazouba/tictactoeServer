@@ -1,1 +1,2 @@
-split Games object to 3x3x3Games and 4x4x4Games
+define a game type for the Game object, let the Games object be able to handle all game types
+listenForNewTTTPlayers will have to have a dict of queues ["gametype"]=queue, so it has a queue for every game type, so it knows how to connect players together

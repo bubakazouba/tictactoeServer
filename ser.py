@@ -39,12 +39,13 @@ def listenForNewPlays():#{
                 newPlaysCV.wait()
                 print "listenForNewPlayers||done waiting for a new play"
         #done with newPlaysCV
-        msg=newPlaysQ.get()#msg is a dict{gameId,playerId,coordinates}
-        gameId=msg["gameId"]
-        playerId=msg["playerId"]
-        coordinates=msg["coordinates"]
+        msg = newPlaysQ.get()#msg is a dict{gameId,playerId,coordinates}
+        gameId = msg["gameId"]
+        playerId = msg["playerId"]
+        coordinates = msg["coordinates"]
+        customData = msg.get("customData",None)
         print "listenForNewPlays||SENDING coordinates"
-        games.play(gameId,playerId,coordinates)
+        games.play(gameId,playerId,coordinates, customData)
         print "listenForNewPlays||DONE sending coordinates"
     #done with while True
 #done with listenForNewPlays()

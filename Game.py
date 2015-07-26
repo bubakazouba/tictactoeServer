@@ -31,9 +31,12 @@ class Game:
     1-takes playerId and coordinates
     2-checks if this is player1 then send to player2 and vice versa
     """
-    def play(self,playerId,coordinates):
+    def play(self,playerId,coordinates, customData = None):
         
-        msg={"coordinates":coordinates}
+        msg={"coordinates":coordinates, "gameId": self.id}
+        if customData is not None:
+            msg["customData"] = customData
+            
         if playerId==self.player1.id:
             self.sock.sendto(msg,self.player2.addressPortTuple)
         else:

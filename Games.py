@@ -37,7 +37,7 @@ class Games:
 
         
 
-    def play(self,gameId,playerId,coordinates):
+    def play(self, gameId, playerId, coordinates, customData):
         with self.gamesCV:
             while not self.gamesIsAvailable:
                 print "Games: add: WAITING for games object"
