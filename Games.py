@@ -22,7 +22,9 @@ class Games:
         playerId2=str(hash(username2+str(random.random()) ))
         p2=Player(playerId2,addressPortTuple2,username2)
 
-        gameId=str(hash(p1.id+p2.id))
+        rand = str(random.random())
+
+        gameId=str(hash(p1.id+p2.id+rand) )
         
         game=Game(p1,p2,gameId,self.sock)
         with self.gamesCV:
@@ -37,14 +39,15 @@ class Games:
 
         
 
-    def play(self, gameId, playerId, coordinates, customData):
+    def play(self, gameId, playerId, coordinates, customData = None):
         with self.gamesCV:
             while not self.gamesIsAvailable:
                 print "Games: add: WAITING for games object"
                 self.gamesCV.wait()
                 print "Games: add: DONE waiting for games object"
         self.gamesIsAvailable=False
-        self.games[gameId].play(playerId,coordinates)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
+        self.games[gameId].play(playerId,coordinates, customData)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
+        #I don't think I need to use the same lock, (i.e I think I should not use any lock at all) because i'm writing to another place in memory
         self.gamesIsAvailable=True
 
         
