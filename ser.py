@@ -39,13 +39,13 @@ def listenForNewPlays():#{
                 newPlaysCV.wait()
                 print "listenForNewPlayers||done waiting for a new play"
         #done with newPlaysCV
-        msg = newPlaysQ.get()#msg is a dict{gameId,playerId,coordinates}
+        msg = newPlaysQ.get()#msg is a dict{gameId,username,coordinates}
         gameId = msg["gameId"]
-        playerId = msg["playerId"]
+        username = msg["username"]
         coordinates = msg["coordinates"]
         customData = msg.get("customData",None)
         print "listenForNewPlays||SENDING coordinates"
-        games.play(gameId,playerId,coordinates, customData)
+        games.play(gameId,username,coordinates, customData)
         print "listenForNewPlays||DONE sending coordinates"
     #done with while True
 #done with listenForNewPlays()
@@ -66,7 +66,7 @@ while True:
     if it has 2 players:
         it takes their usernames,addressPortTuple
         then give it to games.add()
-            games.add() generates playerId and gameId and stuff
+            games.add() generates gameId and stuff
             and send the players their ids and stuff
 """
 def listenForNewTTTPlayers():
@@ -120,7 +120,14 @@ def main():
         except:
             msg={"msg":msg}
 
-        if "username" in msg.keys():# wanna play a new game
+        if "coordinates" in msg.keys():#{ wanna make a play
+            with newPlaysCV:
+                #msg contains the gameId,username,coordinates
+                newPlaysQ.put(msg)
+                # print "main||DID put him in the newPlaysQ"
+                newPlaysCV.notify()
+        #end elif "coordinates" in msg.keys()
+        elif "username" in msg.keys():# wanna play a new game
             with newTTTPlayersCV:
                 msg["addressPortTuple"]=addressPortTuple
                 #msg contains the username, addressPortTuple
@@ -129,13 +136,6 @@ def main():
                 # print "main||DID put him in the newTTTPlayersQ"
                 newTTTPlayersCV.notify()
         #end wanna play a new game
-        elif "coordinates" in msg.keys():#{ wanna make a play
-            with newPlaysCV:
-                #msg contains the gameId,playerId,coordinates
-                newPlaysQ.put(msg)
-                # print "main||DID put him in the newPlaysQ"
-                newPlaysCV.notify()
-        #end elif "coordinates" in msg.keys()
 
     #end while True
 #end main

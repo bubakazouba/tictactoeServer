@@ -16,15 +16,13 @@ class Games:
     #end __init__
 
     def add(self,username1,username2,addressPortTuple1,addressPortTuple2):
-        playerId1=str(hash(username1+str(random.random()) ))
-        p1=Player(playerId1,addressPortTuple1,username1)
+        p1=Player(username1,addressPortTuple1)
 
-        playerId2=str(hash(username2+str(random.random()) ))
-        p2=Player(playerId2,addressPortTuple2,username2)
+        p2=Player(username2,addressPortTuple2)
 
         rand = str(random.random())
-
-        gameId=str(hash(p1.id+p2.id+rand) )
+        print p1.username, p2.username, rand, type(p1.username)
+        gameId=str( hash(p1.username+p2.username+rand) )
         
         game=Game(p1,p2,gameId,self.sock)
         with self.gamesCV:
@@ -39,14 +37,14 @@ class Games:
 
         
 
-    def play(self, gameId, playerId, coordinates, customData = None):
+    def play(self, gameId, username, coordinates, customData = None):
         with self.gamesCV:
             while not self.gamesIsAvailable:
                 print "Games: add: WAITING for games object"
                 self.gamesCV.wait()
                 print "Games: add: DONE waiting for games object"
         self.gamesIsAvailable=False
-        self.games[gameId].play(playerId,coordinates, customData)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
+        self.games[gameId].play(username,coordinates, customData)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
         #I don't think I need to use the same lock, (i.e I think I should not use any lock at all) because i'm writing to another place in memory
         self.gamesIsAvailable=True
 

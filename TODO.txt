@@ -2,3 +2,5 @@ define a game type for the Game object, let the Games object be able to handle a
 listenForNewTTTPlayers will have to have a dict of queues ["gametype"]=queue, so it has a queue for every game type, so it knows how to connect players together
 
 make sure player doesn't play with himself
+
+------------------------

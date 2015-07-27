@@ -21,9 +21,9 @@ class Socket:
         # self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT, 1)#so any socket can use this port
         self.sock.bind(('',port))
 
-        self.msgsLock=threading.Lock()
-        self.msgsCV=threading.Condition(self.msgsLock)
-        self.msgsQ=Queue.Queue()#a queue of messages available to be returned through recv function
+        self.msgsLock = threading.Lock()
+        self.msgsCV = threading.Condition(self.msgsLock)
+        self.msgsQ = Queue.Queue()#a queue of messages available to be returned through recv function
 
         self.recvACKS  = Dict() #ACKS[addressPortTuple] = [list of ACKS of messages that are received and proccessed]
 

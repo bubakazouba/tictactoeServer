@@ -1,6 +1,5 @@
 class Player:
-    def __init__(self,Id,addressPortTuple,name):
-        self.id=Id
+    def __init__(self,username,addressPortTuple):
         self.addressPortTuple=addressPortTuple
-        self.name=name
+        self.username=username
 #done with Player
