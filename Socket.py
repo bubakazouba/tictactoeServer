@@ -79,7 +79,11 @@ class Socket:
         while True:
             print "Socket||__listen||waiting for new msg"
             recv,addressPortTuple = self.sock.recvfrom(1024)
-            recvJ = json.loads(recv)
+            try:
+                recvJ = json.loads(recv)
+            except:
+                print "Socket||__listen||got non json object:"+recv
+                recvJ = {"msg": recv}
 
             if recvJ.get("msg","") == "ack":# if I'm receiving an ack, then it's an ack to a message i sent
                 print "Socket||__listen||im receiving an ack"
@@ -87,7 +91,7 @@ class Socket:
                 continue
 
             else:# then it's a message intended to me, I better reply to it
-                #first: just sent the ack
+                #first: just send the ack
                 sendJ={ "msg" : "ack", "ack" : recvJ["ack"] }
                 self.sock.sendto(json.dumps(sendJ),addressPortTuple)
                 print "Socket||__listen||sending ACK back,"+json.dumps(sendJ)
