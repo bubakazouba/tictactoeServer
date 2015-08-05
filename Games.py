@@ -21,7 +21,6 @@ class Games:
         p2=Player(username2,addressPortTuple2)
 
         rand = str(random.random())
-        print p1.username, p2.username, rand, type(p1.username)
         gameId=str( hash(p1.username+p2.username+rand) )
         
         game=Game(p1,p2,gameId,self.sock)

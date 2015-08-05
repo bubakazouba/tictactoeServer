@@ -3,4 +3,9 @@ listenForNewTTTPlayers will have to have a dict of queues ["gametype"]=queue, so
 
 make sure player doesn't play with himself
 
+add a "msg" field for all packets specifying what they do.
+
+write a doc for all server/client interactions with the specific keys for every request
+
+when a client disconnects: remove from memory the values in dictionaries (like sentACKS[addressPortTuple]=[]) delete all of these from memory
 ------------------------

@@ -7,12 +7,12 @@ class ACKManager:
         self.sentACKS = {}
         self.confirmedACKS = {}
 
-        self.sentLock=threading.Lock()
-        self.confirmedLock=threading.Lock()
+        self.sentACKSLock=threading.Lock()
+        self.confirmedACKSLock=threading.Lock()
     #end __init__
 
     def getACK(self,addressPortTuple):# call it when u send a message to get an ACK number, so you can include it in the msg
-        self.sentLock.acquire()
+        self.sentACKSLock.acquire()
 
         # get the maximum ack number of the list in the dictionary, if it doesnt exist then it's just 0
         ack = max( self.sentACKS.get(addressPortTuple,[-1])  ) + 1
@@ -22,7 +22,7 @@ class ACKManager:
         else:
             self.sentACKS.get(addressPortTuple).append(ack)
 
-        self.sentLock.release()
+        self.sentACKSLock.release()
 
         return str(ack)
     #end getACK
@@ -30,7 +30,7 @@ class ACKManager:
     def confirmACK(self,addressPortTuple,ack):# call it when you have received an ACK and you want to confirm it
         ack = int(ack)
 
-        self.confirmedLock.acquire()
+        self.confirmedACKSLock.acquire()
 
         acks = self.confirmedACKS.get(addressPortTuple,None)
 
@@ -39,19 +39,30 @@ class ACKManager:
         else:
             self.confirmedACKS.get(addressPortTuple).append(ack)
 
-        self.confirmedLock.release()
+        self.confirmedACKSLock.release()
     #end confirmACK
 
     def isACKConfirmed(self,addressPortTuple,ack):# call it when you want to check if ACK is confirmed
         ack = int(ack)
 
-        self.confirmedLock.acquire()
+        self.confirmedACKSLock.acquire()
 
         confirmedACKS = self.confirmedACKS.get(addressPortTuple,[])
 
-        self.confirmedLock.release()
+        self.confirmedACKSLock.release()
 
         return ack in confirmedACKS
 
-        
+    #TODO: to be used
+    def disconnect(self,addressPortTuple): # call it when a client has disconnected to clean up memory
+
+        self.confirmedACKSLock.acquire()
+        del self.confirmedACKS[addressPortTuple]
+        self.confirmedACKSLock.release()
+
+        self.sentACKSLock.acquire()
+        del self.sentACKS[addressPortTuple]
+        self.sentACKSLock.release()
+    #end disconnect
+
 #end ACK

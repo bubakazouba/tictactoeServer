@@ -119,7 +119,7 @@ def main():
             msg=json.loads(msg)
         except:
             msg={"msg":msg}
-
+        print "main||got msg="+json.dumps(msg)
         if "coordinates" in msg.keys():#{ wanna make a play
             with newPlaysCV:
                 #msg contains the gameId,username,coordinates
