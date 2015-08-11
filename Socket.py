@@ -7,7 +7,7 @@ so the send function just sends and adds it to the dict: (msg,addressPortTuple,t
 the thread loops in the dict and sees if anything needs sending again, it sends if it needs sending
 """
 
-import sys
+# import sys
 import socket
 import threading
 import Queue #synchronized queue
@@ -69,7 +69,7 @@ class Socket:
         # print "Socket||__sendto||"+json.dumps(addressPortTuple),"ack=",msg["ack"]
         print "added ",msg["ack"], "to pending"
         self.pendingACKsPackets.append( Packet( msg, int(msg["ack"]), addressPortTuple, time.time() ) )
-        time.sleep(0.5)
+        # time.sleep(0.5)
     #end sendto
 
     def __startUpWaitingForAcksThread(self):
@@ -120,7 +120,7 @@ class Socket:
             #         sys.stdout.write(str(packet.ack)+" "+str(packet.addressPortTuple)+", ")
             #     print ""
             arrayToBeLooped = packetsNotConfirmed
-            time.sleep(0.5)
+            # time.sleep(0.5)
         #end of while
     #end __waitingForAcks
 
