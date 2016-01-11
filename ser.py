@@ -44,9 +44,9 @@ def listenForNewPlays():#{
         username = msg["username"]
         coordinates = msg["coordinates"]
         customData = msg.get("customData",None)
-        print "listenForNewPlays||SENDING coordinates"
+        # print "listenForNewPlays||SENDING coordinates"
         games.play(gameId,username,coordinates, customData)
-        print "listenForNewPlays||DONE sending coordinates"
+        # print "listenForNewPlays||DONE sending coordinates"
     #done with while True
 #done with listenForNewPlays()
 
@@ -76,9 +76,9 @@ def listenForNewTTTPlayers():
     while True:
         with newTTTPlayersCV:
             while newTTTPlayersQ.empty():# just wait while its empty
-                print "listenForNewTTTPlayers||WAITING for a new player"
+                # print "listenForNewTTTPlayers||WAITING for a new player"
                 newTTTPlayersCV.wait()
-                print "listenForNewTTTPlayers||DONE waiting for a new player"
+                # print "listenForNewTTTPlayers||DONE waiting for a new player"
             
         # done with newTTTPlayersCV
         pairOfPlayers.append(newTTTPlayersQ.get())
@@ -90,9 +90,9 @@ def listenForNewTTTPlayers():
             username2=pairOfPlayers[1]["username"]
             addressPortTuple1=pairOfPlayers[0]["addressPortTuple"]
             addressPortTuple2=pairOfPlayers[1]["addressPortTuple"]
-            print "listenForNewTTTPlayers||adding a new game"
+            # print "listenForNewTTTPlayers||adding a new game"
             games.add(username1,username2,addressPortTuple1,addressPortTuple2)
-            print "listenForNewTTTPlayers||done adding a new game"
+            # print "listenForNewTTTPlayers||done adding a new game"
             pairOfPlayers=[]
         #done pairing two players together
 
@@ -114,7 +114,7 @@ def main():
         msg,addressPortTuple=sock.recvfrom(1024)
         # with open("log.txt","a") as logFile:
             # logFile.write(msg+"\n")
-        print "main||GOT msg=",msg
+        # print "main||GOT msg=",msg
         try:
             msg=json.loads(msg)
         except:
@@ -131,7 +131,7 @@ def main():
             with newTTTPlayersCV:
                 msg["addressPortTuple"]=addressPortTuple
                 #msg contains the username, addressPortTuple
-                print "main||GOING to put him in newTTTPlayersQ"
+                # print "main||GOING to put him in newTTTPlayersQ"
                 newTTTPlayersQ.put(msg)
                 # print "main||DID put him in the newTTTPlayersQ"
                 newTTTPlayersCV.notify()

@@ -11,7 +11,7 @@ class Game:
     3-sends to both players their gameId,whichPlayer
     """
     def __init__(self,player1,player2,gameId,sock):
-        print "__init__ Game: thread=",threading.current_thread().getName()
+        # print "__init__ Game: thread=",threading.current_thread().getName()
         self.player1=player1
         self.player2=player2
         self.id=gameId
@@ -20,10 +20,11 @@ class Game:
 
         player1Msg={"gameId":self.id,"whichPlayer":"1"}
         player2Msg={"gameId":self.id,"whichPlayer":"2"}
-        print "__init__ Game: sending to players"
+        # print "__init__ Game: sending to players"
+        print "pair: "+player1.username+" "+player2.username
         self.sock.sendto(player1Msg,self.player1.addressPortTuple)
         self.sock.sendto(player2Msg,self.player2.addressPortTuple)
-        print "__init__ Game: done sending to players"
+        # print "__init__ Game: done sending to players"
     #done with init
 
     """

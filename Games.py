@@ -1,6 +1,5 @@
 from Player import Player
 from Game import Game
-import random
 import threading
 
 """
@@ -17,35 +16,12 @@ class Games:
 
     def add(self,username1,username2,addressPortTuple1,addressPortTuple2):
         p1=Player(username1,addressPortTuple1)
-
         p2=Player(username2,addressPortTuple2)
+        gameId=str( hash(p1.username+p2.username) )
 
-        rand = str(random.random())
-        gameId=str( hash(p1.username+p2.username+rand) )
-        
-        game=Game(p1,p2,gameId,self.sock)
-        with self.gamesCV:
-            while not self.gamesIsAvailable:
-                print "Games: add: WAITING for games object"
-                self.gamesCV.wait()
-                print "Games: add: DONE waiting for games object"
-
-        self.gamesIsAvailable=False
-        self.games[game.id]=game
-        self.gamesIsAvailable=True
-
-        
+        self.games[gameId]=Game(p1,p2,gameId,self.sock)
 
     def play(self, gameId, username, coordinates, customData = None):
-        with self.gamesCV:
-            while not self.gamesIsAvailable:
-                print "Games: add: WAITING for games object"
-                self.gamesCV.wait()
-                print "Games: add: DONE waiting for games object"
-        self.gamesIsAvailable=False
-        self.games[gameId].play(username,coordinates, customData)####DO I REALLY NEED TO USE THE SAME LOCK HERE?(the same lock as the one in the add function)
-        #I don't think I need to use the same lock, (i.e I think I should not use any lock at all) because i'm writing to another place in memory
-        self.gamesIsAvailable=True
+        self.games[gameId].play(username,coordinates, customData)
 
-        
-#done with Games
+#end Games

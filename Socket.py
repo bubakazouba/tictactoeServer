@@ -67,7 +67,7 @@ class Socket:
 
         self.sock.sendto(json.dumps(msg),addressPortTuple)
         # print "Socket||__sendto||"+json.dumps(addressPortTuple),"ack=",msg["ack"]
-        print "added ",msg["ack"], "to pending"
+        # print "added ",msg["ack"], "to pending"
         self.pendingACKsPackets.append( Packet( msg, int(msg["ack"]), addressPortTuple, time.time() ) )
         # time.sleep(0.5)
     #end sendto
@@ -98,29 +98,18 @@ class Socket:
 
             packetsNotConfirmed = []# reset local array of loop
 
-            # if len(arrayToBeLooped) != 0:
-            #     sys.stdout.write("gonna loop these")
-            #     for packet in arrayToBeLooped:
-            #         sys.stdout.write(str(packet.ack)+" "+str(packet.addressPortTuple)+", ")
-            #     print ""
-
             for packet in arrayToBeLooped:
                 if self.ACKManager.isACKConfirmed(packet.addressPortTuple,packet.ack):
-                    print "got the ack: ", packet.ack
+                    # print "got the ack: ", packet.ack
                     continue
                 if time.time() - packet.lastTimeSent >=0.5:
-                    print "didn't get the ack sending again: ", packet.ack
+                    print "didn't get the ack sending again: "+str(packet.ack)+str(packet.msg)
                     self.sock.sendto(json.dumps(packet.msg), packet.addressPortTuple)
+                    packet.lastTimeSent=time.time()
                 packetsNotConfirmed.append(packet)
             #end of for
 
-            # if len(packetsNotConfirmed) != 0:
-            #     sys.stdout.write("packetsNotConfirmed=")
-            #     for packet in packetsNotConfirmed:
-            #         sys.stdout.write(str(packet.ack)+" "+str(packet.addressPortTuple)+", ")
-            #     print ""
             arrayToBeLooped = packetsNotConfirmed
-            # time.sleep(0.5)
         #end of while
     #end __waitingForAcks
 
@@ -128,41 +117,42 @@ class Socket:
     def recvfrom(self,buffer=1024):
         with self.recvMsgsCV:#
             while self.recvMsgsQ.empty():# just wait while its empty
-                print "Socket||recvfrom||waiting for a new msg"
+                # print "Socket||recvfrom||waiting for a new msg"
                 self.recvMsgsCV.wait()
-                print "Socket||recvfrom||done waiting for a new msg"
+                # print "Socket||recvfrom||done waiting for a new msg"
 
             msg,addressPortTuple = self.recvMsgsQ.get()
         #done with self.recvMsgsCV
-        
-        
         return msg,addressPortTuple
     #end recv
 
     def __listen(self):
         while True:
-            print "Socket||__listen||waiting for new msg"
+            # print "Socket||__listen||waiting for new msg"
             recv,addressPortTuple = self.sock.recvfrom(1024)
             try:
                 recvJ = json.loads(recv)
             except:
-                print "Socket||__listen||got non json object:"+recv
+                # print "Socket||__listen||got non json object:"+recv
                 recvJ = {"msg": recv}
 
             if recvJ.get("msg","") == "ack": # I'm receiving an ack to a message I sent
-                print "Socket||__listen||im receiving an ack"
+                # print "Socket||__listen||im receiving an ack"
                 self.ACKManager.confirmACK(addressPortTuple,int(recvJ["ack"]))
                 continue
 
             else:# then it's a message intended to me, I better reply to it
                 #first: just send the ack
-                sendJ={ "msg" : "ack", "ack" : recvJ["ack"] }
+                print "Socket||__listen||sending ACK back,to this msg:"+str(recvJ)
+                if "ack" not in recvJ.keys():
+                    continue
+                sendJ={ "msg": "ack", "ack": recvJ["ack"] }
                 self.sock.sendto(json.dumps(sendJ),addressPortTuple)
-                print "Socket||__listen||sending ACK back,"+json.dumps(sendJ)
+                
 
                 #second: see if we already have it just skip ... we don't want to process it twice, do we?
                 if addressPortTuple in self.recvACKs.keys() and recvJ["ack"] in self.recvACKs.get(addressPortTuple):
-                    print "Socket||__listen||we already have that, Skipping..."
+                    # print "Socket||__listen||we already have that, Skipping..."
                     continue
 
                 #third: oh, looks like it wasn't processed before, we better mark it as proccessed then
@@ -171,7 +161,7 @@ class Socket:
                 else:
                     self.recvACKs.get(addressPortTuple).append( recvJ["ack"] )
 
-                #fourth: and ofcourse, put it in the processing queue
+                #fourth: and of course, put it in the processing queue
                 with self.recvMsgsCV:
                     self.recvMsgsQ.put( (recv,addressPortTuple) )
                     self.recvMsgsCV.notify()
