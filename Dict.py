@@ -33,7 +33,3 @@ class Dict:
     def values(self):
         return self.myDict.values()
     #end values
-
-    # def exists(self,key):
-    #     return key in self.myDict.keys()
-    # #end exists

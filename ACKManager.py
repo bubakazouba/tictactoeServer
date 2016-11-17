@@ -29,9 +29,7 @@ class ACKManager:
 
     def confirmACK(self,addressPortTuple,ack):# call it when you have received an ACK and you want to confirm it
         ack = int(ack)
-
         self.confirmedACKSLock.acquire()
-
         acks = self.confirmedACKS.get(addressPortTuple,None)
 
         if acks == None:
@@ -44,11 +42,8 @@ class ACKManager:
 
     def isACKConfirmed(self,addressPortTuple,ack):# call it when you want to check if ACK is confirmed
         ack = int(ack)
-
         self.confirmedACKSLock.acquire()
-
         confirmedACKS = self.confirmedACKS.get(addressPortTuple,[])
-
         self.confirmedACKSLock.release()
 
         return ack in confirmedACKS
